@@ -12,6 +12,7 @@ class ArtistAccess:
                 state=form['state'],
                 phone=form['phone'],
                 genres=form.getlist('genres'),
+                image_link=form['image_link'],
                 facebook_link=form['facebook_link'])
             db.session.add(new_artist)
             db.session.commit()

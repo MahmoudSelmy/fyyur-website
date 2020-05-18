@@ -13,7 +13,8 @@ class VenueAccess:
                 address=form['address'],
                 phone=form['phone'],
                 genres=form.getlist('genres'),
-                facebook_link=form['facebook_link']
+                facebook_link=form['facebook_link'],
+                image_link=form['image_link']
             )
             db.session.add(new_venue)
             db.session.commit()
@@ -21,7 +22,7 @@ class VenueAccess:
             print(e)
             db.session.close()
             raise ValueError('This for is in valid')
-        
+
     @classmethod
     def search_venues(cls, search_term):
         venues = Venue.query.filter(Venue.name.contains(search_term)).all()
@@ -78,7 +79,7 @@ class VenueAccess:
     @classmethod
     def get_venue_by_id(cls, venue_id):
         return Venue.query.get(venue_id)
-    
+
     @classmethod
     def update_venue_using_form(cls, venue_id, form):
         venue = Venue.query.get(venue_id)
