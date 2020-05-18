@@ -71,12 +71,15 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-    try:
-        VenueAccess.create_venue_using_form(request.form)
-        flash('Venue ' + request.form['name'] + ' was successfully listed!')
-    except Exception as e:
-        print(e)
-        flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
+    if request.form.validate():
+        try:
+            VenueAccess.create_venue_using_form(request.form)
+            flash('Venue ' + request.form['name'] + ' was successfully listed!')
+        except Exception as e:
+            print(e)
+            flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
+    else:
+        flash('Please add all data fields')
     return render_template('pages/home.html')
 
 
@@ -148,13 +151,16 @@ def create_artist_form():
 
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
-    try:
-        ArtistAccess.create_artist_from_form(request.form)
-        # on successful db insert, flash success
-        flash('Artist ' + request.form['name'] + ' was successfully listed!')
-    except Exception as e:
-        print(e)
-        flash('An error occurred. Artist ' + request.form['name'] + ' could not be listed.')
+    if request.form.validate():
+        try:
+            ArtistAccess.create_artist_from_form(request.form)
+            # on successful db insert, flash success
+            flash('Artist ' + request.form['name'] + ' was successfully listed!')
+        except Exception as e:
+            print(e)
+            flash('An error occurred. Artist ' + request.form['name'] + ' could not be listed.')
+    else:
+        flash('Please add all data fields')
     return render_template('pages/home.html')
 
 
@@ -176,15 +182,18 @@ def create_shows():
 
 @app.route('/shows/create', methods=['POST'])
 def create_show_submission():
-    try:
-        ShowAccess.create_show_using_form(request.form)
-        # on successful db insert, flash success
-        flash('Show was successfully listed!')
-    except Exception as e:
-        print(e)
-        flash('An error occurred. Show could not be listed.')
-    finally:
-        db.session.close()
+    if request.form.validate():
+        try:
+            ShowAccess.create_show_using_form(request.form)
+            # on successful db insert, flash success
+            flash('Show was successfully listed!')
+        except Exception as e:
+            print(e)
+            flash('An error occurred. Show could not be listed.')
+        finally:
+            db.session.close()
+    else:
+        flash('Please add all data fields')
     return render_template('pages/home.html')
 
 
