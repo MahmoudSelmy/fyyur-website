@@ -101,7 +101,7 @@ def artists():
 
 @app.route('/artists/search', methods=['POST'])
 def search_artists():
-    response = ArtistAccess.get_all_artists()
+    response = ArtistAccess.search_artists(request.form.get('search_term', ''))
     return render_template('pages/search_artists.html', results=response,
                            search_term=request.form.get('search_term', ''))
 
