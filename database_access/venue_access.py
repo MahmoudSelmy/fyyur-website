@@ -44,8 +44,10 @@ class VenueAccess:
     @classmethod
     def _get_show_data(cls, venue_id, date_filter_function):
         shows = (db.session.query(Artist.id.label("artist_id"), Artist.name.label("artist_name"),
+
                                   Artist.image_link.label("artist_image_link"), Show)
                  .filter(Show.c.venue_id == venue_id)
+                 .filter(Show.c.artist_id == Artist.id)
                  .filter(date_filter_function(Show.c.start_time, datetime.now()))
                  .all())
         return shows
