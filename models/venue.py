@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from .core_model import *
 from .show import Show
 
@@ -19,3 +21,22 @@ class Venue(db.Model):
     seeking_talent = db.Column(db.Boolean, default=False)
     seeking_description = db.Column(db.String())
     artists = db.relationship('Artist', secondary=Show, backref=db.backref('venues', lazy=True))
+
+    def convert_to_dict(self):
+        upcoming_count = (db.session.query(func.count(Show.c.venue_id))
+                            .filter(Show.c.venue_id == self.id)
+                            .filter(Show.c.start_time > datetime.now()).all()[0][0])
+        return {
+            'id': self.id,
+            'name': self.name,
+            'num_upcoming_shows': upcoming_count
+        }
+
+    @classmethod
+    def search_venues(cls, search_term):
+        venues = Venue.query.filter(Venue.name.contains(search_term)).all()
+        response = {
+            "count": len(venues),
+            "data": venues
+        }
+        return response

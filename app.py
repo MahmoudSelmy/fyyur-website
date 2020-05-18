@@ -9,6 +9,7 @@ from flask import Flask, render_template, request, Response, flash, redirect, ur
 import logging
 from logging import Formatter, FileHandler
 from flask_wtf import Form
+from sqlalchemy import func, inspect
 from forms import *
 from app_core import app
 from models import db, Venue, Artist, Show
@@ -39,51 +40,25 @@ def index():
     return render_template('pages/home.html')
 
 
-#  Venues
-#  ----------------------------------------------------------------
+def prepare_venues_data():
+    data = db.session.query(Venue.city, Venue.state).group_by(Venue.city, Venue.state)
+    venues_data = []
+    for a in data:
+        area = a._asdict()
+        area['venues'] = [ven.convert_to_dict() for ven in Venue.query.filter_by(city=area['city']).all()]
+        venues_data.append(area)
+    return venues_data
+
 
 @app.route('/venues')
 def venues():
-    # TODO: replace with real venues data.
-    #       num_shows should be aggregated based on number of upcoming shows per venue.
-    data = [{
-        "city": "San Francisco",
-        "state": "CA",
-        "venues": [{
-            "id": 1,
-            "name": "The Musical Hop",
-            "num_upcoming_shows": 0,
-        }, {
-            "id": 3,
-            "name": "Park Square Live Music & Coffee",
-            "num_upcoming_shows": 1,
-        }]
-    }, {
-        "city": "New York",
-        "state": "NY",
-        "venues": [{
-            "id": 2,
-            "name": "The Dueling Pianos Bar",
-            "num_upcoming_shows": 0,
-        }]
-    }]
-    return render_template('pages/venues.html', areas=data);
+    return render_template('pages/venues.html', areas=prepare_venues_data())
 
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
-    # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
-    # seach for Hop should return "The Musical Hop".
-    # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
-    response = {
-        "count": 1,
-        "data": [{
-            "id": 2,
-            "name": "The Dueling Pianos Bar",
-            "num_upcoming_shows": 0,
-        }]
-    }
-    return render_template('pages/search_venues.html', results=response,
+    search_term = request.form.get('search_term', '')
+    return render_template('pages/search_venues.html', results=Venue.search_venues(search_term),
                            search_term=request.form.get('search_term', ''))
 
 
