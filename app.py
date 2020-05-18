@@ -13,6 +13,7 @@ from sqlalchemy import func, inspect
 from forms import *
 from app_core import app
 from models import db, Venue, Artist, Show
+from database_access import VenueAccess
 
 
 # ----------------------------------------------------------------------------#
@@ -20,6 +21,8 @@ from models import db, Venue, Artist, Show
 # ----------------------------------------------------------------------------#
 
 def format_datetime(value, format='medium'):
+    if isinstance(value, datetime):
+        return value
     date = dateutil.parser.parse(value)
     if format == 'full':
         format = "EEEE MMMM, d, y 'at' h:mma"
@@ -42,19 +45,19 @@ def index():
 
 @app.route('/venues')
 def venues():
-    return render_template('pages/venues.html', areas=Venue.get_all_venues_grouped_by_area())
+    return render_template('pages/venues.html', areas=VenueAccess.get_all_venues_grouped_by_area())
 
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
     search_term = request.form.get('search_term', '')
-    return render_template('pages/search_venues.html', results=Venue.search_venues(search_term),
+    return render_template('pages/search_venues.html', results=VenueAccess.search_venues(search_term),
                            search_term=request.form.get('search_term', ''))
 
 
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
-    return render_template('pages/show_venue.html', venue=Venue.get_venue_show_data(Artist, venue_id))
+    return render_template('pages/show_venue.html', venue=VenueAccess.get_venue_show_data(venue_id))
 
 
 #  Create Venue
