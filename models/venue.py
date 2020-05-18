@@ -3,6 +3,8 @@ from datetime import datetime
 from .core_model import *
 from .show import Show
 
+from forms import VenueForm
+
 
 class Venue(db.Model):
     __tablename__ = 'venue'
@@ -31,3 +33,14 @@ class Venue(db.Model):
             'name': self.name,
             'num_upcoming_shows': upcoming_count
         }
+
+    def convert_venue_to_form(self):
+        form = VenueForm()
+        form.name.data = self.name
+        form.city.data = self.city
+        form.state.data = self.state
+        form.address.data = self.address
+        form.phone.data = self.phone
+        form.genres.data = self.genres
+        form.facebook_link.data = self.facebook_link
+        return form

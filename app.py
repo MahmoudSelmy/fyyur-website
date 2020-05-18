@@ -13,7 +13,7 @@ from sqlalchemy import func, inspect
 from forms import *
 from app_core import app
 from models import db, Venue, Artist, Show
-from database_access import VenueAccess
+from database_access import VenueAccess, ArtistAccess
 
 
 # ----------------------------------------------------------------------------#
@@ -82,9 +82,7 @@ def create_venue_submission():
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
-    # TODO: Complete this endpoint for taking a venue_id, and using
-    # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
-
+    VenueAccess.delete_venue(venue_id)
     # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
     # clicking that button delete it from the db then redirect the user to the homepage
     return None
@@ -230,35 +228,19 @@ def edit_artist(artist_id):
 def edit_artist_submission(artist_id):
     # TODO: take values from the form submitted, and update existing
     # artist record with ID <artist_id> using the new attributes
-
     return redirect(url_for('show_artist', artist_id=artist_id))
 
 
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
-    form = VenueForm()
-    venue = {
-        "id": 1,
-        "name": "The Musical Hop",
-        "genres": ["Jazz", "Reggae", "Swing", "Classical", "Folk"],
-        "address": "1015 Folsom Street",
-        "city": "San Francisco",
-        "state": "CA",
-        "phone": "123-123-1234",
-        "website": "https://www.themusicalhop.com",
-        "facebook_link": "https://www.facebook.com/TheMusicalHop",
-        "seeking_talent": True,
-        "seeking_description": "We are on the lookout for a local artist to play every two weeks. Please call us.",
-        "image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60"
-    }
-    # TODO: populate form with values from venue with ID <venue_id>
+    venue = VenueAccess.get_venue_by_id(venue_id)
+    form = venue.convert_venue_to_form()
     return render_template('forms/edit_venue.html', form=form, venue=venue)
 
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
-    # TODO: take values from the form submitted, and update existing
-    # venue record with ID <venue_id> using the new attributes
+    VenueAccess.update_venue_using_form(venue_id, request.form)
     return redirect(url_for('show_venue', venue_id=venue_id))
 
 
@@ -271,30 +253,15 @@ def create_artist_form():
     return render_template('forms/new_artist.html', form=form)
 
 
-def submit_artist():
-    new_artist = Artist(
-        name=request.form['name'],
-        city=request.form['city'],
-        state=request.form['state'],
-        phone=request.form['phone'],
-        genres=request.form.getlist('genres'),
-        facebook_link=request.form['facebook_link']
-    )
-    db.session.add(new_artist)
-    db.session.commit()
-
-
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
     try:
-        submit_artist()
+        ArtistAccess.create_artist_from_form(request.form)
         # on successful db insert, flash success
-        flash('Venue ' + request.form['name'] + ' was successfully listed!')
+        flash('Artist ' + request.form['name'] + ' was successfully listed!')
     except Exception as e:
         print(e)
         flash('An error occurred. Artist ' + request.form['name'] + ' could not be listed.')
-    finally:
-        db.session.close()
     return render_template('pages/home.html')
 
 

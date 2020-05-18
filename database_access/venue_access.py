@@ -72,3 +72,32 @@ class VenueAccess:
         venue.past_shows_count = len(venue.past_shows)
         venue.upcoming_shows_count = len(venue.upcoming_shows)
         return venue
+
+    @classmethod
+    def get_venue_by_id(cls, venue_id):
+        return Venue.query.get(venue_id)
+    
+    @classmethod
+    def update_venue_using_form(cls, venue_id, form):
+        venue = Venue.query.get(venue_id)
+        venue.name = form['name'],
+        venue.city = form['city'],
+        venue.state = form['state'],
+        venue.address = form['address'],
+        venue.phone = form['phone'],
+        venue.genres = form.getlist('genres'),
+        venue.facebook_link = form['facebook_link']
+        db.session.add(venue)
+        db.session.commit()
+        db.session.close()
+
+    @classmethod
+    def delete_venue(cls, venue_id):
+        try:
+            Venue.query.filter_by(id=venue_id).delete()
+            db.session.commit()
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+        finally:
+            db.session.close()
