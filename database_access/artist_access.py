@@ -66,3 +66,20 @@ class ArtistAccess:
         artist.past_shows_count = len(artist.past_shows)
         artist.upcoming_shows_count = len(artist.upcoming_shows)
         return artist
+
+    @classmethod
+    def get_artist_by_id(cls, artist_id):
+        return Artist.query.get(artist_id)
+
+    @classmethod
+    def update_artist_using_form(cls, artist_id, form):
+        artist = Artist.query.get(artist_id)
+        artist.name = form['name'],
+        artist.city = form['city'],
+        artist.state = form['state'],
+        artist.phone = form['phone'],
+        artist.genres = form.getlist('genres'),
+        artist.facebook_link = form['facebook_link']
+        db.session.add(artist)
+        db.session.commit()
+        db.session.close()

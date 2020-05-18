@@ -1,4 +1,5 @@
 from .core_model import *
+from forms import ArtistForm
 
 
 class Artist(db.Model):
@@ -15,3 +16,14 @@ class Artist(db.Model):
 
     seeking_venue = db.Column(db.Boolean, nullable=False, default=False)
     seeking_description = db.Column(db.String())
+
+    def convert_venue_to_form(self):
+        form = ArtistForm()
+        form.name.data = self.name
+        form.city.data = self.city
+        form.state.data = self.state
+        form.address.data = self.address
+        form.phone.data = self.phone
+        form.genres.data = self.genres
+        form.facebook_link.data = self.facebook_link
+        return form
