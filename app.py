@@ -72,29 +72,12 @@ def create_venue_form():
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
     try:
-        submit_venue()
-        # on successful db insert, flash success
+        VenueAccess.create_venue_using_form(request.form)
         flash('Venue ' + request.form['name'] + ' was successfully listed!')
     except Exception as e:
         print(e)
         flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
-    finally:
-        db.session.close()
     return render_template('pages/home.html')
-
-
-def submit_venue():
-    new_venue = Venue(
-        name=request.form['name'],
-        city=request.form['city'],
-        state=request.form['state'],
-        address=request.form['address'],
-        phone=request.form['phone'],
-        genres=request.form.getlist('genres'),
-        facebook_link=request.form['facebook_link']
-    )
-    db.session.add(new_venue)
-    db.session.commit()
 
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])

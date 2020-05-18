@@ -4,6 +4,25 @@ from datetime import datetime
 
 class VenueAccess:
     @classmethod
+    def create_venue_using_form(cls, form):
+        try:
+            new_venue = Venue(
+                name=form['name'],
+                city=form['city'],
+                state=form['state'],
+                address=form['address'],
+                phone=form['phone'],
+                genres=form.getlist('genres'),
+                facebook_link=form['facebook_link']
+            )
+            db.session.add(new_venue)
+            db.session.commit()
+        except Exception as e:
+            print(e)
+            db.session.close()
+            raise ValueError('This for is in valid')
+        
+    @classmethod
     def search_venues(cls, search_term):
         venues = Venue.query.filter(Venue.name.contains(search_term)).all()
         response = {
