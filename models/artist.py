@@ -15,4 +15,3 @@ class Artist(db.Model):
 
     seeking_venue = db.Column(db.Boolean, nullable=False, default=False)
     seeking_description = db.Column(db.String())
-    shows = db.relationship('Show', backref='list', lazy=True)
